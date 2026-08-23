@@ -3,6 +3,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- 手部追踪支持（非必需，存在则用手势；避免系统因"仅手柄"拦截启动） -->
+    <uses-feature
+        android:name="oculus.software.handtracking"
+        android:required="false" />
+    <uses-permission android:name="com.oculus.permission.HAND_TRACKING" />
+
     <application>
         <!-- VR 沉浸入口：com.oculus.intent.category.VR 让它出现在 Quest 应用库 -->
         <activity
@@ -16,6 +22,13 @@
                 <category android:name="com.oculus.intent.category.VR" />
             </intent-filter>
         </activity>
+
+        <!-- 允许 MainActivity 被嵌入为 VR 面板（官方 ActivityPanel 机制要求）；
+             仅 quest 变体生效，mobile 不受影响 -->
+        <activity
+            android:name="com.android.purebilibili.MainActivity"
+            android:allowEmbedded="true"
+            tools:node="merge" />
 
         <!-- 关闭手机端唯一的启用状态桌面 alias，避免 Quest 应用库出现双图标 -->
         <activity-alias
