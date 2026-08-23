@@ -108,10 +108,12 @@ class ImmersiveActivity : AppSystemActivity() {
     }
 
     private fun spawnPanels() {
+        // 主面板：z=1.85 拉近 + px 1280x800 让整体 UI 在固定物理尺寸下放大，
+        // 实现"大控件/大字号"的舒适基线（docs/vr/gesture-comfort.md §2.1）
         val mainPanel =
             Entity.createPanelEntity(
                 R.id.bilipai_main_panel,
-                Transform(Pose(Vector3(x = 0f, y = 1.35f, z = 2f), Quaternion(0f, 0f, 0f))),
+                Transform(Pose(Vector3(x = 0f, y = 1.38f, z = 1.85f), Quaternion(0f, 0f, 0f))),
             )
         Log.d(TAG, "main panel spawned id=${mainPanel.id}")
 
@@ -119,7 +121,7 @@ class ImmersiveActivity : AppSystemActivity() {
         val controlBar =
             Entity.createPanelEntity(
                 R.id.bilipai_control_bar,
-                Transform(Pose(Vector3(x = 0f, y = 0.22f, z = 1.98f), Quaternion(0f, 0f, 0f))),
+                Transform(Pose(Vector3(x = 0f, y = 0.22f, z = 1.83f), Quaternion(0f, 0f, 0f))),
                 Grabbable(),
             )
         Log.d(TAG, "control bar spawned id=${controlBar.id}")
@@ -139,8 +141,10 @@ class ImmersiveActivity : AppSystemActivity() {
             config {
                 height = 1.9f
                 width = 3.0f
-                layoutWidthInPx = 1600
-                layoutHeightInPx = 1000
+                // 1280x800（而非 1600x1000）：同等物理尺寸下 UI 元素放大约 25%，
+                // 是"全应用大控件"成本最低的实现；清晰度在 Quest 2 上仍可接受
+                layoutWidthInPx = 1280
+                layoutHeightInPx = 800
                 layerConfig = QuadLayerConfig()
                 panelShader = SceneMaterial.HOLE_PUNCH_SHADER
                 alphaMode = AlphaMode.HOLE_PUNCH
