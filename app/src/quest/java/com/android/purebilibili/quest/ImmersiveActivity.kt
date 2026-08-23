@@ -18,19 +18,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import com.android.purebilibili.MainActivity
 import com.android.purebilibili.R
 import com.android.purebilibili.core.util.VrPanelRuntimeFlags
@@ -178,16 +183,35 @@ class ImmersiveActivity : AppSystemActivity() {
  * VR 导航条 UI。舒适规则（docs/vr/gesture-comfort.md）：
  * - 控件高 96dp+、间距 24dp+
  * - hover 即放大高亮（ISDK 把射线悬停翻译成 hover 事件）
+ * - 召唤式：默认只有一个 ☰ 把手，点击展开；6s 无操作自动收起
  */
 @Composable
 fun VrControlBar(onHome: () -> Unit, onHide: () -> Unit) {
-    Row(
-        modifier = Modifier.padding(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(24.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        ControlButton(label = "Quest 主页", icon = Icons.Filled.Home, onClick = onHome)
-        ControlButton(label = "隐藏面板", icon = Icons.AutoMirrored.Filled.ArrowBack, onClick = onHide)
+    var expanded by remember { mutableStateOf(false) }
+
+    // 展开状态下 6 秒无交互自动收起
+    if (expanded) {
+        LaunchedEffect(Unit) {
+            delay(6000)
+            expanded = false
+        }
+    }
+
+    if (!expanded) {
+        ControlButton(
+            label = "菜单",
+            icon = Icons.Filled.Menu,
+            onClick = { expanded = true },
+        )
+    } else {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            ControlButton(label = "Quest 主页", icon = Icons.Filled.Home, onClick = onHome)
+            ControlButton(label = "隐藏面板", icon = Icons.AutoMirrored.Filled.ArrowBack, onClick = onHide)
+        }
     }
 }
 
