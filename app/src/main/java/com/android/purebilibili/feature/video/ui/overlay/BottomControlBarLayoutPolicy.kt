@@ -1,6 +1,7 @@
 package com.android.purebilibili.feature.video.ui.overlay
 
 import com.android.purebilibili.core.store.PlayerProgressPlacement
+import com.android.purebilibili.core.util.VrPanelRuntimeFlags
 
 data class BottomControlBarLayoutPolicy(
     val bottomPaddingDp: Int,
@@ -61,6 +62,36 @@ internal fun resolveVideoDetailProgressPlacement(
 fun resolveBottomControlBarLayoutPolicy(
     widthDp: Int
 ): BottomControlBarLayoutPolicy {
+    // VR 面板：射线瞄准需要大控件（docs/vr/gesture-comfort.md §2.1），不受窗口宽度分桶影响
+    if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) {
+        return BottomControlBarLayoutPolicy(
+            bottomPaddingDp = 24,
+            progressSpacingDp = 16,
+            horizontalPaddingDp = 40,
+            playButtonSizeDp = 72,
+            playIconSizeDp = 52,
+            afterPlaySpacingDp = 16,
+            timeFontSp = 20,
+            afterTimeSpacingDp = 24,
+            danmakuIconSizeDp = 44,
+            danmakuSwitchToInputSpacingDp = 14,
+            danmakuSwitchHorizontalPaddingDp = 16,
+            danmakuSwitchVerticalPaddingDp = 12,
+            danmakuInputHeightDp = 64,
+            danmakuInputStartPaddingDp = 22,
+            danmakuInputFontSp = 20,
+            danmakuSettingButtonSizeDp = 56,
+            danmakuSettingEndPaddingDp = 8,
+            danmakuSettingIconSizeDp = 32,
+            afterInputSpacingDp = 20,
+            rightActionSpacingDp = 20,
+            actionChipHorizontalPaddingDp = 14,
+            actionChipVerticalPaddingDp = 10,
+            actionTextFontSp = 22,
+            fullscreenIconSizeDp = 40
+        )
+    }
+
     if (widthDp >= 1600) {
         return BottomControlBarLayoutPolicy(
             bottomPaddingDp = 18,

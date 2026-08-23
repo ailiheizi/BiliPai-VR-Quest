@@ -1,5 +1,7 @@
 package com.android.purebilibili.feature.video.ui.overlay
 
+import com.android.purebilibili.core.util.VrPanelRuntimeFlags
+
 data class VideoProgressBarLayoutPolicy(
     val baseHeightWithoutChapterDp: Int,
     val baseHeightWithChapterDp: Int,
@@ -21,6 +23,27 @@ data class VideoProgressBarLayoutPolicy(
 fun resolveVideoProgressBarLayoutPolicy(
     widthDp: Int
 ): VideoProgressBarLayoutPolicy {
+    // VR 面板：进度条加粗加高、thumb 放大（docs/vr/gesture-comfort.md §2.1）
+    if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) {
+        return VideoProgressBarLayoutPolicy(
+            baseHeightWithoutChapterDp = 48,
+            baseHeightWithChapterDp = 64,
+            draggingContainerHeightDp = 180,
+            previewBottomPaddingDp = 44,
+            chapterBottomPaddingDp = 10,
+            chapterStartPaddingDp = 28,
+            chapterIconSizeDp = 24,
+            chapterSpacingDp = 12,
+            chapterFontSp = 18,
+            touchContainerHeightDp = 48,
+            trackHeightDp = 10f,
+            thumbIdleSizeDp = 28,
+            thumbDraggingSizeDp = 40,
+            thumbIdleOffsetDp = 16,
+            thumbDraggingOffsetDp = 22
+        )
+    }
+
     if (widthDp >= 1600) {
         return VideoProgressBarLayoutPolicy(
             baseHeightWithoutChapterDp = 32,

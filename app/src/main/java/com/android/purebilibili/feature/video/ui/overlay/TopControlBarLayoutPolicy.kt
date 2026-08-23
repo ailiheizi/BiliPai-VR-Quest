@@ -1,5 +1,7 @@
 package com.android.purebilibili.feature.video.ui.overlay
 
+import com.android.purebilibili.core.util.VrPanelRuntimeFlags
+
 data class TopControlBarLayoutPolicy(
     val horizontalPaddingDp: Int,
     val verticalPaddingDp: Int,
@@ -19,6 +21,25 @@ data class TopControlBarLayoutPolicy(
 fun resolveTopControlBarLayoutPolicy(
     widthDp: Int
 ): TopControlBarLayoutPolicy {
+    // VR 面板：返回/操作大按钮（docs/vr/gesture-comfort.md §2.1）
+    if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) {
+        return TopControlBarLayoutPolicy(
+            horizontalPaddingDp = 40,
+            verticalPaddingDp = 16,
+            timeFontSp = 20,
+            timeBottomSpacingDp = 10,
+            buttonSizeDp = 64,
+            iconSizeDp = 42,
+            backToTitleSpacingDp = 24,
+            sectionGapDp = 36,
+            actionSpacingDp = 36,
+            titleFontSp = 22,
+            onlineCountStartPaddingDp = 72,
+            onlineCountFontSp = 17,
+            onlineCountTopPaddingDp = 4
+        )
+    }
+
     if (widthDp >= 1600) {
         return TopControlBarLayoutPolicy(
             horizontalPaddingDp = 32,

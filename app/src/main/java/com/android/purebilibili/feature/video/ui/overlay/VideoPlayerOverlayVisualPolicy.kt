@@ -1,5 +1,7 @@
 package com.android.purebilibili.feature.video.ui.overlay
 
+import com.android.purebilibili.core.util.VrPanelRuntimeFlags
+
 data class VideoPlayerOverlayVisualPolicy(
     val topScrimHeightDp: Int,
     val bottomScrimHeightDp: Int,
@@ -32,6 +34,38 @@ data class VideoPlayerOverlayVisualPolicy(
 fun resolveVideoPlayerOverlayVisualPolicy(
     widthDp: Int
 ): VideoPlayerOverlayVisualPolicy {
+    // VR 面板：中央播放大按钮 + 锁定/互动大图标（docs/vr/gesture-comfort.md §2.1）
+    if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) {
+        return VideoPlayerOverlayVisualPolicy(
+            topScrimHeightDp = 240,
+            bottomScrimHeightDp = 320,
+            lockButtonEndPaddingDp = 48,
+            lockButtonSizeDp = 84,
+            lockButtonCornerRadiusDp = 22,
+            lockIconSizeDp = 40,
+            statsTopPaddingDp = 120,
+            statsEndPaddingDp = 44,
+            statsHorizontalPaddingDp = 16,
+            statsVerticalPaddingDp = 8,
+            statsCornerRadiusDp = 8,
+            statsFontSp = 18,
+            centerPlayButtonSizeDp = 144,
+            centerPlayInnerButtonSizeDp = 104,
+            centerPlayIconSizeDp = 72,
+            qualitySwitchCornerRadiusDp = 20,
+            qualitySwitchOuterPaddingDp = 40,
+            qualitySwitchContentHorizontalPaddingDp = 40,
+            qualitySwitchContentVerticalPaddingDp = 24,
+            qualitySwitchContentSpacingDp = 20,
+            qualitySwitchMessageFontSp = 20,
+            interactionIconSizeDp = 40,
+            interactionLabelFontSp = 16,
+            interactionLabelTopSpacingDp = 8,
+            tripleActionSpacingDp = 32,
+            tripleRingExtraSizeDp = 24
+        )
+    }
+
     if (widthDp >= 1600) {
         return VideoPlayerOverlayVisualPolicy(
             topScrimHeightDp = 200,

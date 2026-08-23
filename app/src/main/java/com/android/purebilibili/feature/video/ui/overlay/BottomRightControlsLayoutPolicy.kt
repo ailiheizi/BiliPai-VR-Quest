@@ -1,5 +1,7 @@
 package com.android.purebilibili.feature.video.ui.overlay
 
+import com.android.purebilibili.core.util.VrPanelRuntimeFlags
+
 data class BottomRightControlsLayoutPolicy(
     val rowSpacingDp: Int,
     val menuOffsetYDp: Int,
@@ -12,6 +14,18 @@ data class BottomRightControlsLayoutPolicy(
 fun resolveBottomRightControlsLayoutPolicy(
     widthDp: Int
 ): BottomRightControlsLayoutPolicy {
+    // VR 面板：倍速/画质/比例大 chip（docs/vr/gesture-comfort.md §2.1）
+    if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) {
+        return BottomRightControlsLayoutPolicy(
+            rowSpacingDp = 16,
+            menuOffsetYDp = -14,
+            chipCornerRadiusDp = 12,
+            chipFontSp = 20,
+            chipHorizontalPaddingDp = 18,
+            chipVerticalPaddingDp = 12
+        )
+    }
+
     if (widthDp >= 1600) {
         return BottomRightControlsLayoutPolicy(
             rowSpacingDp = 12,

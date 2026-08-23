@@ -102,6 +102,7 @@ import androidx.media3.common.Player
 import androidx.media3.ui.PlayerView
 import com.android.purebilibili.core.util.FormatUtils
 import com.android.purebilibili.core.util.Logger
+import com.android.purebilibili.core.util.VrPanelRuntimeFlags
 import com.android.purebilibili.core.util.applyPlayerRequestedOrientation
 import com.android.purebilibili.feature.video.ui.gesture.GestureMode
 import com.android.purebilibili.feature.video.ui.gesture.GestureIndicator
@@ -1154,13 +1155,13 @@ fun FullscreenPlayerOverlay(
                                 imageVector = if (danmakuEnabled) Icons.Filled.ChatBubble else Icons.Outlined.ChatBubbleOutline,
                                 contentDescription = if (danmakuEnabled) "关闭弹幕" else "开启弹幕",
                                 tint = if (danmakuEnabled) danmakuActiveColor else danmakuInactiveColor,
-                                modifier = Modifier.size(16.dp)
+                                modifier = Modifier.size(if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) 28.dp else 16.dp)
                             )
-                            Spacer(modifier = Modifier.width(4.dp))
+                            Spacer(modifier = Modifier.width(if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) 8.dp else 4.dp))
                             AppText(
                                 text = if (danmakuEnabled) "开" else "关",
                                 color = if (danmakuEnabled) danmakuActiveColor else danmakuInactiveColor,
-                                fontSize = 12.sp,
+                                fontSize = if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) 18.sp else 12.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
@@ -1205,7 +1206,7 @@ fun FullscreenPlayerOverlay(
                                     imageVector = if (isPlaying) Icons.Filled.Pause else Icons.Filled.PlayArrow,
                                     contentDescription = if (isPlaying) "暂停" else "播放",
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(32.dp)
+                                    modifier = Modifier.size(if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) 52.dp else 32.dp)
                                 )
                             }
                             
@@ -1654,9 +1655,12 @@ private fun FullscreenControlButton(
         AppText(
             text = text,
             color = if (isHighlighted) MaterialTheme.colorScheme.primary else Color.White,
-            fontSize = 12.sp,
+            fontSize = if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) 18.sp else 12.sp,
             fontWeight = if (isHighlighted) FontWeight.Bold else FontWeight.Normal,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+            modifier = Modifier.padding(
+                horizontal = if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) 20.dp else 12.dp,
+                vertical = if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) 12.dp else 6.dp
+            )
         )
     }
 }
