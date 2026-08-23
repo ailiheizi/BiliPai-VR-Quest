@@ -49,15 +49,22 @@ class ImmersiveActivity : AppSystemActivity() {
     override fun onSceneReady() {
         super.onSceneReady()
         scene.setReferenceSpace(ReferenceSpace.LOCAL_FLOOR)
-        Log.d(TAG, "onSceneReady: spawning main panel entity")
+        Log.d(TAG, "onSceneReady: scheduling main panel spawn")
 
-        // 官方模板配方：createPanelEntity + 身份旋转；距离 Phase 2 再调
-        val panelEntity =
-            Entity.createPanelEntity(
-                R.id.bilipai_main_panel,
-                Transform(Pose(Vector3(x = 0f, y = 1.3f, z = 2f), Quaternion(0f, 0f, 0f))),
-            )
-        Log.d(TAG, "onSceneReady: panel entity created id=${panelEntity.id}")
+        // 官方模板配方：createPanelEntity + 身份旋转。
+        // 延迟到主线程队列空闲后创建，确保 registerPanels() 注册已就位（否则
+        // PanelCreationSystem 找不到注册会静默跳过）。
+        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed(
+            {
+                val panelEntity =
+                    Entity.createPanelEntity(
+                        R.id.bilipai_main_panel,
+                        Transform(Pose(Vector3(x = 0f, y = 1.3f, z = 2f), Quaternion(0f, 0f, 0f))),
+                    )
+                Log.d(TAG, "panel spawned late: id=${panelEntity.id}")
+            },
+            1500,
+        )
     }
 
     override fun registerPanels(): List<PanelRegistration> {
