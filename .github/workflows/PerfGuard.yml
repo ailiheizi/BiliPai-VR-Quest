@@ -52,7 +52,7 @@ jobs:
           # 暴露给 Gradle，必须显式传入，settings.gradle.kts 才能读取它。
           GITHUB_TOKEN: ${{ github.token }}
         run: |
-          ./gradlew :app:testDebugUnitTest \
+          ./gradlew :app:testMobileDebugUnitTest \
             --tests 'com.android.purebilibili.core.ui.perf.FrameBudgetLintTest' \
             --tests 'com.android.purebilibili.data.model.ModelImmutabilityGuardTest' \
             --tests 'com.android.purebilibili.core.ui.lint.HardcodedColorLintTest' \
@@ -70,5 +70,5 @@ jobs:
         uses: actions/upload-artifact@v6
         with:
           name: perfguard-test-report
-          path: app/build/reports/tests/testDebugUnitTest
+          path: app/build/reports/tests/testMobileDebugUnitTest
           retention-days: 7

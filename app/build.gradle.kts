@@ -247,6 +247,25 @@ android {
         baseline = file("lint-baseline.xml")
         abortOnError = true
     }
+
+    // ===== VR (Quest) 方向：mobile 保持现状，quest 是独立 VR 变体 =====
+    // 见 AGENTS.md「Quest VR flavor」与 docs/vr/。
+    flavorDimensions += "platform"
+    productFlavors {
+        create("mobile") {
+            dimension = "platform"
+            // 手机端默认形态，零改动。
+        }
+        create("quest") {
+            dimension = "platform"
+            // Meta Spatial SDK 要求 Horizon OS = API 34+。
+            minSdk = 34
+            // applicationId 刻意保持与 mobile 一致：
+            // 1) google-services.json 按 package 匹配，换 id 会破坏 quest 变体的 Firebase 处理；
+            // 2) 安装目标天然隔离（手机 vs 头显），同设备并存需求出现时再拆 id。
+            targetSdk = 34
+        }
+    }
 }
 
 // AGP 中间产物改用 BiliPai-<version> 基名（避免 app-release.apk）；
@@ -258,13 +277,18 @@ base {
 androidComponents {
     onVariants(selector().all()) { variant ->
         val variantName = variant.name.lowercase()
-        if (variantName == "release" || variantName == "dev") {
+        // 加 platform flavor 后变体名为 mobileXxx / questXxx。
+        // 交付 APK 命名只服务手机端交付策略；quest 打包流程在 Phase 3 单独定义。
+        val isQuest = variantName.startsWith("quest")
+        val baseVariantName =
+            if (isQuest) variantName.removePrefix("quest") else variantName.removePrefix("mobile")
+        if (!isQuest && (baseVariantName == "release" || baseVariantName == "dev")) {
             val capitalizedVariantName = variant.name.replaceFirstChar { character ->
                 character.uppercaseChar()
             }
-            val deliveryFileName = when (variantName) {
+            val deliveryFileName = when (baseVariantName) {
                 "release" -> "BiliPai-$biliApkVersionName.apk"
-                else -> "BiliPai-$biliApkVersionName-$variantName.apk"
+                else -> "BiliPai-$biliApkVersionName-$baseVariantName.apk"
             }
             // 中间产物直接用规范名：beta 等预发布版本不应带 AGP 默认的 -release 后缀
             // （archivesName 已含完整 versionName）。AGP 9 VariantOutput.outputFileName。
@@ -311,7 +335,13 @@ val prepareKspGeneratedVariants = listOf(
     "release",
     "releaseUnitTest",
     "dev",
-    "devUnitTest"
+    "devUnitTest",
+    // platform flavor 拆分后的变体（quest 只需编译验证，单测沿用 mobile）。
+    "mobileDebug",
+    "mobileDebugUnitTest",
+    "mobileRelease",
+    "mobileDev",
+    "questDebug"
 )
 
 val prepareKspGeneratedDirs by tasks.registering(PrepareKspGeneratedDirsTask::class) {
@@ -530,9 +560,18 @@ dependencies {
     
     // --- 13. Android Instrumented Tests ---
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
+    androidTestImplementation("androidx.espresso:espresso-core:3.7.0")
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+    // --- 14. Quest VR (quest flavor 专属，mobile 永不引入) ---
+    // 版本对齐官方 Meta-Spatial-SDK-Samples（HybridSample 用 0.13.2）。
+    val spatialSdkVersion = "0.13.2"
+    add("questImplementation", "com.meta.spatial:meta-spatial-sdk:$spatialSdkVersion")
+    add("questImplementation", "com.meta.spatial:meta-spatial-sdk-vr:$spatialSdkVersion")
+    add("questImplementation", "com.meta.spatial:meta-spatial-sdk-compose:$spatialSdkVersion")
+    add("questImplementation", "com.meta.spatial:meta-spatial-sdk-toolkit:$spatialSdkVersion")
+    add("questImplementation", "com.meta.spatial:meta-spatial-sdk-isdk:$spatialSdkVersion")
 }
 
 tasks.register("assembleFast") {

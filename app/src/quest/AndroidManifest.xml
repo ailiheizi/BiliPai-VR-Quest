@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- quest flavor 专属：VR 入口。手机端 (mobile) 不受影响。 -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application>
+        <!-- VR 沉浸入口：com.oculus.intent.category.VR 让它出现在 Quest 应用库 -->
+        <activity
+            android:name="com.android.purebilibili.quest.ImmersiveActivity"
+            android:exported="true"
+            android:theme="@style/Theme.PureBiliBili"
+            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden|mnc|colorMode|density|smallestScreenSize|uiMode">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="com.oculus.intent.category.VR" />
+            </intent-filter>
+        </activity>
+
+        <!-- 关闭手机端唯一的启用状态桌面 alias，避免 Quest 应用库出现双图标 -->
+        <activity-alias
+            android:name=".MainActivityAliasBlueSnowMaid"
+            android:enabled="false"
+            tools:node="merge"
+            tools:replace="android:enabled" />
+    </application>
+
+</manifest>

@@ -46,7 +46,7 @@ jobs:
         run: echo "${{ secrets.FCM }}" | base64 -d > app/google-services.json
 
       - name: Compile release and collect Compose compiler data
-        run: ./gradlew :app:compileReleaseKotlin -Pbili.composeReports=true --no-daemon --no-configuration-cache --console=plain
+        run: ./gradlew :app:compileMobileReleaseKotlin -Pbili.composeReports=true --no-daemon --no-configuration-cache --console=plain
 
       - name: Verify report output
         run: |

@@ -16,7 +16,7 @@ run_step() {
 
 echo "Running local CI verification from: $ROOT_DIR"
 
-run_step "Unit tests" ./gradlew :app:testDebugUnitTest
+run_step "Unit tests" ./gradlew :app:testMobileDebugUnitTest
 run_step "Android Lint" ./gradlew :app:lintDebug
 run_step "Debug assemble" ./gradlew :app:assembleDebug
 
