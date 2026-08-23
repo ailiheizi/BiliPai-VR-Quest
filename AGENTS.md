@@ -156,3 +156,45 @@ Pick the newest `gradle-*-bin/*/gradle-*/bin/gradle` that matches the wrapper ve
 - Treat `ralph`, `team`, `ultrawork`, `plan`, `deep-interview`, and other multi-phase workflow skills as high-overhead options. Use them only when the user explicitly asks for them or when the task truly needs planning, persistent retries, or parallel lanes.
 - Prefer domain-specific helpers such as `android-native-dev`, `android-jetpack-compose-expert`, `debugger`, `explore`, and `verifier` before generic orchestration skills.
 - For OMX or skill usage questions, answer directly unless a workflow skill is clearly necessary to complete a concrete configuration or implementation task.
+
+## Quest VR flavor (BiliPai VR — 长期目标：YouTube VR 级舒适手势)
+
+> 独立于手机端的方向。目标：在 Meta Quest 2/3 上用 Meta Spatial SDK 把 BiliPai 渲染成 VR 曲面面板，达到 YouTube VR 级手势舒适度。完整方案见 `docs/vr/`。
+
+### 不变式（VR 方向，任何 agent 都必须遵守）
+
+- **`quest` productFlavor 独立构建，`mobile` flavor 与手机端 UI 零改动**。所有 VR 改动只在 `app/src/quest/...` 与 `app/build.gradle.kts` 的 quest 分支。
+- **不重写 UI、不写 OpenXR/C++ 渲染**。只依赖 Meta Spatial SDK 的 `VRFeature` + `ComposeFeature` + `PanelRegistration`，把现有 Compose 页面渲染成面板。
+- **不引入新依赖除非用户明确要求**。Spatial SDK 相关依赖只进 `quest` flavor。
+- 手势目标 = **YouTube VR 级舒适**，不是"能点就行"。舒适 = 大控件(96px+)、明显 hover/吸附态、避免触屏专属交互、可抓取 3D 滑块。
+- 登录、播放、弹幕、搜索等业务逻辑全部复用现有代码，VR 层只做壳与输入适配。
+- **Quest 2 手势精度低于 Quest 3**：目标必须更大、吸附更强；手柄+手势双通道并行。
+
+### 技术路线（抄官方，不发明）
+
+- 抄 `Meta-Spatial-SDK-Samples/HybridSample`：`AppSystemActivity` + `registerFeatures()` 注册 `VRFeature`/`ComposeFeature` + `PanelRegistration` 挂现有 Activity。
+- 手势管线：面板内 UI 由 ISDK 自动把空间指针/手部射线/Pinch 翻译成标准 Android touch 事件，**面板内的 Compose 不需要自己写手势代码**。
+- 显式启用：`SpatialFeature.INTERACTION` + `IsdkSupportingSystems()`（自动配置手/手柄射线）+ 依赖 `meta-spatial-sdk-isdk`。
+- 进阶（面板内 UI 到极限后）：3D 环绕视频墙、`Grabbable` + `IsdkGrabConstraints` 做可抓滑块、`hand.getJointPose`/`getPinchStrength` 做微手势。
+- 版本基线（官方 HybridSample）：compileSdk 34 / minSdk 34 / targetSdk 34 / JDK 17 / AGP 8.11 / Kotlin 2.1。BiliPai 当前 AGP 9.3.1 / Kotlin 2.4 / JDK 21 / compileSdk 37 —— **quest flavor 如遇版本冲突，可降 toolchain，但 mobile flavor 永不动**。
+- Horizon OS 需 v69+。启动类要加 `com.oculus.intent.category.VR` 类别，否则不出现在 Quest 应用库。
+
+### VR 验证路径
+
+- Quest 设备：`adb -s 1WMHH86ARM1335`（本机还连着一台小米，务必 -s 指定）。
+- 构建：`:app:assembleQuestDebug`；侧载 `adb -s 1WMHH86ARM1335 install -r app/build/outputs/apk/quest/debug/app-quest-debug.apk`；启动 `adb -s 1WMHH86ARM1335 shell am start -n com.android.purebilibili.quest/.quest.ImmersiveActivity`。
+- 无 Quest 时的替代验证：先跑通官方 HybridSample 到 Quest（Phase 0 门槛），或对照 Wolvic。
+- VR 代码只编译 quest 变体：`:app:compileQuestDebugKotlin`（手机端常规验证命令保持 `:app:compileDebugKotlin` 不变）。
+
+### VR 阶段定义（每阶段可验收）
+
+- **Phase 0 — 环境**：JDK 21 + SDK platform 37 + Gradle 9.5.0 装齐；BiliPai `:app:compileDebugKotlin` 可过；官方 HybridSample 在 Quest 上跑通（3D 场景 + 可交互面板 + 手部射线/Pinch 可用）。
+- **Phase 1 — 最小 demo**：`quest` flavor 建好；BiliPai 首页以 VR 面板出现在 Quest 应用库；能看首页、点进视频、播放有声；手柄 + 手势都能操作。手势 = 系统默认即可。
+- **Phase 2 — 舒适手势（重点）**：播放页大控件(≥96px)、主页卡片墙、hover/吸附反馈、扫码登录、面板距离/曲率舒适；手柄+手势双通道可用；长时间不晕。这一阶段是"YouTube VR 级舒适"的主战场，工作量最大，**优先于任何 3D 进阶功能**。
+- **Phase 3 — 稳定**：登录会话保持、网络/清晰度/解码回归、72fps、APK 打包流程可复现。
+
+### 优先级与克制
+
+- 顺序永远：Phase 0 → 1 → 2 → 3。Phase 2 的"面板内大控件+hover"优先于任何 3D 环绕/抓取进阶。
+- 不要一开始就写 3D 手势代码；面板内 UI 舒适度达标后，再考虑 Grabbable/微手势。
+- quest flavor 的改动要能回滚：提交与 push 按"每个可验收切片"做，不要大段堆积。

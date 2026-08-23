@@ -106,6 +106,8 @@ docs/*
 !docs/wiki/*.md
 !docs/wiki/ui-design/
 !docs/wiki/ui-design/**/*.md
+!docs/vr/
+!docs/vr/*.md
 .omx/
 
 # Local Reasonix session settings and metadata
