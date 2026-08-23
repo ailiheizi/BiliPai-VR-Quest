@@ -21,6 +21,9 @@ internal fun shouldRequestPhysicalPlayerOrientation(
  * requestedOrientation on tablets, so do not discard a user's fullscreen request there.
  */
 internal fun Activity.applyPlayerRequestedOrientation(requestedOrientation: Int): Boolean {
+    // VR 面板窗口朝向固定（横屏 quad），任何 requestedOrientation 都会把面板
+    // 内容转成"横着的竖屏"并破坏触摸映射，直接忽略。
+    if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) return false
     val effectiveOrientation = if (
         shouldRequestPhysicalPlayerOrientation(resources.configuration.smallestScreenWidthDp)
     ) {

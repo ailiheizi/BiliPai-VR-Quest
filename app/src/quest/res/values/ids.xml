@@ -2,4 +2,5 @@
 <resources>
     <!-- quest flavor 面板注册 ID -->
     <item type="id" name="bilipai_main_panel" />
+    <item type="id" name="bilipai_control_bar" />
 </resources>
