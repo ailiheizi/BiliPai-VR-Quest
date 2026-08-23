@@ -115,11 +115,11 @@ class ImmersiveActivity : AppSystemActivity() {
             )
         Log.d(TAG, "main panel spawned id=${mainPanel.id}")
 
-        // 导航条：主面板正下方偏近处，抬头可见、垂手可及
+        // 导航条：贴在主面板下缘之外（不与面板内容重叠，否则会拦截应用的点击）
         val controlBar =
             Entity.createPanelEntity(
                 R.id.bilipai_control_bar,
-                Transform(Pose(Vector3(x = 0f, y = 0.45f, z = 1.7f), Quaternion(0f, 0f, 0f))),
+                Transform(Pose(Vector3(x = 0f, y = 0.22f, z = 1.98f), Quaternion(0f, 0f, 0f))),
                 Grabbable(),
             )
         Log.d(TAG, "control bar spawned id=${controlBar.id}")
