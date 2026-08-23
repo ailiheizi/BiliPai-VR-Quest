@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -55,6 +56,7 @@ import com.meta.spatial.runtime.SceneMaterial
 import com.meta.spatial.toolkit.AppSystemActivity
 import com.meta.spatial.toolkit.Grabbable
 import com.meta.spatial.toolkit.PanelRegistration
+import com.meta.spatial.toolkit.Scale
 import com.meta.spatial.toolkit.Transform
 import com.meta.spatial.toolkit.createPanelEntity
 import com.meta.spatial.vr.VRFeature
@@ -78,6 +80,24 @@ class ImmersiveActivity : AppSystemActivity() {
     private companion object {
         const val TAG = "BiliPaiVR"
         const val PANEL_SPAWN_DELAY_MS = 1500L
+
+        // 画面大小档位：标准 / 放大 / 缩小
+        val PANEL_SIZE_SCALES = listOf(1.0f, 1.2f, 0.8f)
+        val PANEL_SIZE_LABELS = listOf("画面 · 标准", "画面 · 放大", "画面 · 缩小")
+    }
+
+    // 导航条与场景实体的共享状态（composePanel 内容读取后可重组）
+    internal val panelSizeLabel = androidx.compose.runtime.mutableStateOf(PANEL_SIZE_LABELS[0])
+    private var mainPanelEntity: Entity? = null
+    private var panelSizeIndex = 0
+
+    /** 循环切换主面板整体缩放；位置保持不变，仅视觉大小变化。 */
+    internal fun cyclePanelSize() {
+        panelSizeIndex = (panelSizeIndex + 1) % PANEL_SIZE_SCALES.size
+        val scale = PANEL_SIZE_SCALES[panelSizeIndex]
+        panelSizeLabel.value = PANEL_SIZE_LABELS[panelSizeIndex]
+        mainPanelEntity?.setComponent(Scale(Vector3(scale, scale, scale)))
+        Log.d(TAG, "panel size -> $scale")
     }
 
     override fun registerFeatures(): List<SpatialFeature> {
@@ -109,12 +129,15 @@ class ImmersiveActivity : AppSystemActivity() {
 
     private fun spawnPanels() {
         // 主面板：z=1.85 拉近 + px 1280x800 让整体 UI 在固定物理尺寸下放大，
-        // 实现"大控件/大字号"的舒适基线（docs/vr/gesture-comfort.md §2.1）
+        // 实现"大控件/大字号"的舒适基线（docs/vr/gesture-comfort.md §2.1）。
+        // Grabbable：用户可自行抓取挪位/拉近，找到最舒适的角度与距离。
         val mainPanel =
             Entity.createPanelEntity(
                 R.id.bilipai_main_panel,
                 Transform(Pose(Vector3(x = 0f, y = 1.38f, z = 1.85f), Quaternion(0f, 0f, 0f))),
+                Grabbable(),
             )
+        mainPanelEntity = mainPanel
         Log.d(TAG, "main panel spawned id=${mainPanel.id}")
 
         // 导航条：贴在主面板下缘之外（不与面板内容重叠，否则会拦截应用的点击）
@@ -168,6 +191,8 @@ class ImmersiveActivity : AppSystemActivity() {
                         VrControlBar(
                             onHome = { launchSystemHome() },
                             onHide = { moveTaskToBack(true) },
+                            onCycleSize = { cyclePanelSize() },
+                            sizeLabel = panelSizeLabel.value,
                         )
                     }
                 }
@@ -190,12 +215,23 @@ class ImmersiveActivity : AppSystemActivity() {
  * - 召唤式：默认只有一个 ☰ 把手，点击展开；6s 无操作自动收起
  */
 @Composable
-fun VrControlBar(onHome: () -> Unit, onHide: () -> Unit) {
+fun VrControlBar(
+    onHome: () -> Unit,
+    onHide: () -> Unit,
+    onCycleSize: () -> Unit,
+    sizeLabel: String,
+) {
     var expanded by remember { mutableStateOf(false) }
+    // 任何点击都会刷新自动收起计时，避免操作中途被收起
+    var interactionTick by remember { androidx.compose.runtime.mutableIntStateOf(0) }
+    fun interact(block: () -> Unit) {
+        interactionTick++
+        block()
+    }
 
     // 展开状态下 6 秒无交互自动收起
     if (expanded) {
-        LaunchedEffect(Unit) {
+        LaunchedEffect(expanded, interactionTick) {
             delay(6000)
             expanded = false
         }
@@ -210,10 +246,11 @@ fun VrControlBar(onHome: () -> Unit, onHide: () -> Unit) {
     } else {
         Row(
             modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(24.dp),
+            horizontalArrangement = Arrangement.spacedBy(20.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            ControlButton(label = "Quest 主页", icon = Icons.Filled.Home, onClick = onHome)
+            ControlButton(label = "Quest 主页", icon = Icons.Filled.Home, onClick = { interact(onHome) })
+            ControlButton(label = sizeLabel, icon = Icons.Filled.ZoomIn, onClick = { interact(onCycleSize) })
             ControlButton(label = "隐藏面板", icon = Icons.AutoMirrored.Filled.ArrowBack, onClick = onHide)
         }
     }
