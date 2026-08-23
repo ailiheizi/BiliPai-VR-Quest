@@ -23,6 +23,7 @@ import com.android.purebilibili.core.ui.AdaptiveLoadingIndicator
 import com.android.purebilibili.core.ui.components.AppIcon
 import com.android.purebilibili.core.ui.components.AppTextButton
 import com.android.purebilibili.core.ui.components.AppText
+import com.android.purebilibili.core.ui.components.magnetHover
 import androidx.compose.runtime.*
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.Modifier
@@ -396,6 +397,7 @@ internal fun HomeCategoryPageContent(
                             preset = DissolveAnimationPreset.TELEGRAM_FAST,
                             preserveContentLayerWhenIdle = cardTransitionEnabled,
                             modifier = Modifier
+                                .magnetHover()
                                 .jiggleOnDissolve(
                                     cardId = video.bvid,
                                     isCurrentCardDissolving = isDissolving

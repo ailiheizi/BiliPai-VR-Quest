@@ -5,6 +5,7 @@ import com.android.purebilibili.core.store.HomeFeedCardWidthPreset
 import com.android.purebilibili.core.util.AppFoldPosture
 import com.android.purebilibili.core.util.AppHingeOrientation
 import com.android.purebilibili.core.util.AppWindowAdaptiveInfo
+import com.android.purebilibili.core.util.VrPanelRuntimeFlags
 import com.android.purebilibili.core.util.WindowWidthSizeClass
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
@@ -21,6 +22,10 @@ internal fun resolveHomeFeedGridColumns(
     widthSizeClass: WindowWidthSizeClass = WindowWidthSizeClass.Medium
 ): Int {
     val isSingleColumnMode = displayMode == 1
+    // VR 大卡片墙：横排 2-3 张大卡片（docs/vr/ux-design.md §3.1），不受用户列数设置影响
+    if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) {
+        return if (isSingleColumnMode) 1 else 3
+    }
     if (!isSingleColumnMode && fixedColumnCount > 0) {
         return fixedColumnCount
     }

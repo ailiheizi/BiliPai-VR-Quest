@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.filled.PlayArrow
 import com.android.purebilibili.core.ui.components.AppIcon
 import com.android.purebilibili.core.ui.components.AppIconButton
+import com.android.purebilibili.core.ui.components.magnetHover
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,6 +31,7 @@ internal fun OverlayPlaybackButton(
         Box(
             contentAlignment = Alignment.Center,
             modifier = modifier
+                .magnetHover()
                 .size(outerSize)
                 .combinedClickable(
                     role = Role.Button,
