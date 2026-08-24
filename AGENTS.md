@@ -183,8 +183,16 @@ Pick the newest `gradle-*-bin/*/gradle-*/bin/gradle` that matches the wrapper ve
 
 - Quest 设备：`adb -s 1WMHH86ARM1335`（本机还连着一台小米，务必 -s 指定）。
 - 构建：`:app:assembleQuestDebug`；侧载 `adb -s 1WMHH86ARM1335 install -r app/build/outputs/apk/quest/debug/app-quest-debug.apk`；启动 `adb -s 1WMHH86ARM1335 shell am start -n com.android.purebilibili.quest/.quest.ImmersiveActivity`。
+- 一键流程：`scripts/vr_sideload.sh`（构建+安装+启动）。
 - 无 Quest 时的替代验证：先跑通官方 HybridSample 到 Quest（Phase 0 门槛），或对照 Wolvic。
 - VR 代码只编译 quest 变体：`:app:compileQuestDebugKotlin`（手机端常规验证命令保持 `:app:compileDebugKotlin` 不变）。
+
+### VR 版本库协作方式
+
+- `origin` = 本机 fork `https://github.com/ailiheizi/BiliPai.git`；VR 工作统一在 `vr/quest` 分支上提交并推送。
+- `upstream` = 上游 `https://github.com/jay3-yy/BiliPai.git`；本地 `main` 分支跟踪 `upstream/main`（手机端纯净基线）。
+- 手机端上游更新时：切到 `main` → `git pull upstream main` → 需要时 `git rebase origin/vr/quest` 把 VR 分支跟上（VR 改动集中在 `app/src/quest/` 与少量 VR 门控代码，冲突面小）。
+- 注意：本机对上游无写权限（403），所有 push 只到 fork。
 
 ### VR 阶段定义（每阶段可验收）
 
