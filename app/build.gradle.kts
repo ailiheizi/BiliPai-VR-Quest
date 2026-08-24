@@ -241,6 +241,8 @@ android {
         }
         // 🔥 允许 Android 类在单元测试中返回默认值而非抛出异常
         unitTests.isReturnDefaultValues = true
+        // Robolectric 需要真实 Android 资源（Compose 面板布局回归用）
+        unitTests.isIncludeAndroidResources = true
     }
 
     lint {
@@ -557,6 +559,10 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
     // Turbine for Flow testing
     testImplementation("app.cash.turbine:turbine:1.0.0")
+    // Robolectric 容器：JVM 上模拟 Android 运行时，真实布局 Compose UI（面板尺寸回归）
+    testImplementation("org.robolectric:robolectric:4.16.1")
+    testImplementation("androidx.compose.ui:ui-test-junit4:1.12.0")
+    testImplementation("androidx.compose.ui:ui-test-manifest:1.12.0")
     
     // --- 13. Android Instrumented Tests ---
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
@@ -572,6 +578,11 @@ dependencies {
     add("questImplementation", "com.meta.spatial:meta-spatial-sdk-compose:$spatialSdkVersion")
     add("questImplementation", "com.meta.spatial:meta-spatial-sdk-toolkit:$spatialSdkVersion")
     add("questImplementation", "com.meta.spatial:meta-spatial-sdk-isdk:$spatialSdkVersion")
+    // Debug 工具链（仅 quest debug 变体启用 features；mobile 永不引入）
+    add("questImplementation", "com.meta.spatial:meta-spatial-sdk-hotreload:$spatialSdkVersion")
+    add("questImplementation", "com.meta.spatial:meta-spatial-sdk-castinputforward:$spatialSdkVersion")
+    add("questImplementation", "com.meta.spatial:meta-spatial-sdk-ovrmetrics:$spatialSdkVersion")
+    add("questImplementation", "com.meta.spatial:meta-spatial-sdk-datamodelinspector:$spatialSdkVersion")
 }
 
 tasks.register("assembleFast") {

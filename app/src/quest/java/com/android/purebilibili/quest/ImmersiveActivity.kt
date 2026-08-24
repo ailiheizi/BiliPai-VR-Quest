@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import com.android.purebilibili.BuildConfig
 import com.android.purebilibili.MainActivity
 import com.android.purebilibili.R
 import com.android.purebilibili.core.util.VrPanelRuntimeFlags
@@ -48,6 +49,11 @@ import com.meta.spatial.core.Quaternion
 import com.meta.spatial.core.SpatialFeature
 import com.meta.spatial.core.Vector3
 import com.meta.spatial.isdk.IsdkFeature
+import com.meta.spatial.castinputforward.CastInputForwardFeature
+import com.meta.spatial.datamodelinspector.DataModelInspectorFeature
+import com.meta.spatial.debugtools.AIDebugToolsFeature
+import com.meta.spatial.debugtools.HotReloadFeature
+import com.meta.spatial.ovrmetrics.OVRMetricsFeature
 import com.meta.spatial.runtime.AlphaMode
 import com.meta.spatial.runtime.LayerConfig
 import com.meta.spatial.runtime.QuadLayerConfig
@@ -101,12 +107,22 @@ class ImmersiveActivity : AppSystemActivity() {
     }
 
     override fun registerFeatures(): List<SpatialFeature> {
-        return listOf(
+        val features = mutableListOf<SpatialFeature>(
             VRFeature(this),
             ComposeFeature(),
             // ISDK：手部射线 + Pinch、手柄激光自动翻译成 Android touch（面板内无需自写手势）
             IsdkFeature(this, spatial, systemManager),
         )
+        if (BuildConfig.DEBUG) {
+            // 开发工具链（对照 HybridSample）：热更新 / MQDH Cast 输入转发 /
+            // OVR 指标 / 数据模型检查器 / AI 脚本化面板点击（adb broadcast）
+            features.add(HotReloadFeature(this))
+            features.add(CastInputForwardFeature(this, Pose(Vector3(0f, 1.5f, -2f))))
+            features.add(OVRMetricsFeature(this))
+            features.add(DataModelInspectorFeature(spatial, componentManager))
+            features.add(AIDebugToolsFeature(this))
+        }
+        return features
     }
 
     override fun onSceneReady() {
@@ -245,8 +261,8 @@ fun VrControlBar(
         )
     } else {
         Row(
-            modifier = Modifier.padding(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            modifier = Modifier.padding(horizontal = VrControlBarPolicy.rowPaddingDp.dp, vertical = VrControlBarPolicy.rowPaddingDp.dp),
+            horizontalArrangement = Arrangement.spacedBy(VrControlBarPolicy.buttonSpacingDp.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             ControlButton(label = "Quest 主页", icon = Icons.Filled.Home, onClick = { interact(onHome) })
@@ -254,6 +270,26 @@ fun VrControlBar(
             ControlButton(label = "隐藏面板", icon = Icons.AutoMirrored.Filled.ArrowBack, onClick = onHide)
         }
     }
+}
+
+/**
+ * 导航条面板布局度量（纯数据，供单测验证是否在面板宽度内不溢出）。
+ * 面板注册宽度 560dp；展开态 3 按钮必须放得下。
+ */
+object VrControlBarPolicy {
+    val buttonWidthDp = 168
+    val buttonHeightDp = 96
+    val buttonSpacingDp = 14
+    val rowPaddingDp = 10
+    val panelWidthDp = 560
+
+    /** 展开态三按钮 + 间距 + 内边距的总宽。 */
+    val expandedRowTotalWidthDp: Int
+        get() = buttonWidthDp * 3 + buttonSpacingDp * 2 + rowPaddingDp * 2
+
+    /** 收起态单按钮总宽。 */
+    val collapsedTotalWidthDp: Int
+        get() = buttonWidthDp + rowPaddingDp * 2
 }
 
 @Composable
@@ -268,8 +304,8 @@ private fun ControlButton(label: String, icon: androidx.compose.ui.graphics.vect
 
     Surface(
         modifier = Modifier
-            .width(168.dp)
-            .height(96.dp)
+            .width(VrControlBarPolicy.buttonWidthDp.dp)
+            .height(VrControlBarPolicy.buttonHeightDp.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
