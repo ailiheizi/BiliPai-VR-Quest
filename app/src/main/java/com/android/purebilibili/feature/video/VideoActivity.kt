@@ -16,6 +16,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
 import com.android.purebilibili.core.util.Logger
+import com.android.purebilibili.core.util.VrPanelRuntimeFlags
 import android.util.Rational
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -193,7 +194,15 @@ class VideoActivity : ComponentActivity() {
                 com.android.purebilibili.feature.video.screen.VideoDetailScreen(
                     bvid = bvid,
                     coverUrl = "", // Will be updated when video info loads
-                    onBack = { onBackPressedDispatcher.onBackPressed() },
+                    onBack = {
+                        if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) {
+                            // VR 面板窗口里预测性返回（OnBackInvokedCallback）链路不可靠，
+                            // 直接结束当前嵌入 Activity；手机端保持原返回语义不变
+                            finish()
+                        } else {
+                            onBackPressedDispatcher.onBackPressed()
+                        }
+                    },
                     onNavigateToAudioMode = {
                         viewModel.setAudioMode(true)
                     },

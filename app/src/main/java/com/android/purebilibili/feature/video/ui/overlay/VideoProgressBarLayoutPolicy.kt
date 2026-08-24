@@ -26,21 +26,21 @@ fun resolveVideoProgressBarLayoutPolicy(
     // VR 面板：进度条加粗加高、thumb 放大（docs/vr/gesture-comfort.md §2.1）
     if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) {
         return VideoProgressBarLayoutPolicy(
-            baseHeightWithoutChapterDp = 48,
-            baseHeightWithChapterDp = 64,
-            draggingContainerHeightDp = 180,
-            previewBottomPaddingDp = 44,
+            baseHeightWithoutChapterDp = 40,
+            baseHeightWithChapterDp = 56,
+            draggingContainerHeightDp = 160,
+            previewBottomPaddingDp = 38,
             chapterBottomPaddingDp = 10,
             chapterStartPaddingDp = 28,
             chapterIconSizeDp = 24,
             chapterSpacingDp = 12,
             chapterFontSp = 18,
-            touchContainerHeightDp = 48,
-            trackHeightDp = 10f,
-            thumbIdleSizeDp = 28,
-            thumbDraggingSizeDp = 40,
-            thumbIdleOffsetDp = 16,
-            thumbDraggingOffsetDp = 22
+            touchContainerHeightDp = 40,
+            trackHeightDp = 8f,
+            thumbIdleSizeDp = 24,
+            thumbDraggingSizeDp = 34,
+            thumbIdleOffsetDp = 13,
+            thumbDraggingOffsetDp = 19
         )
     }
 
