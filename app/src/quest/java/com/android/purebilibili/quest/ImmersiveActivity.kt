@@ -245,8 +245,8 @@ fun VrControlBar(
         )
     } else {
         Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier.padding(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             ControlButton(label = "Quest 主页", icon = Icons.Filled.Home, onClick = { interact(onHome) })
@@ -268,32 +268,32 @@ private fun ControlButton(label: String, icon: androidx.compose.ui.graphics.vect
 
     Surface(
         modifier = Modifier
-            .width(240.dp)
-            .height(104.dp)
+            .width(168.dp)
+            .height(96.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
             },
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(24.dp),
         color = if (hovered) Color(0xFF2D5BFF) else Color(0xCC1C1C22),
         border = if (hovered) BorderStroke(2.dp, Color.White.copy(alpha = 0.85f)) else null,
         onClick = onClick,
         interactionSource = interactionSource,
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            modifier = Modifier.padding(horizontal = 14.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = Color.White,
-                modifier = Modifier.width(34.dp).height(34.dp),
+                modifier = Modifier.width(30.dp).height(30.dp),
             )
             Text(
                 text = label,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.titleMedium,
                 color = Color.White,
             )
         }

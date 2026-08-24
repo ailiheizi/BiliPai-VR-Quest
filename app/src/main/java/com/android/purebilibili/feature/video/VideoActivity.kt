@@ -196,9 +196,13 @@ class VideoActivity : ComponentActivity() {
                     coverUrl = "", // Will be updated when video info loads
                     onBack = {
                         if (VrPanelRuntimeFlags.activityEmbeddedInVrPanel) {
-                            // VR 面板窗口里预测性返回（OnBackInvokedCallback）链路不可靠，
-                            // 直接结束当前嵌入 Activity；手机端保持原返回语义不变
-                            finish()
+                            // VR 面板窗口里预测性返回与 finish() 链路都不可靠，
+                            // 用 finishAndRemoveTask 确保嵌入窗口真正关闭；留日志定位
+                            com.android.purebilibili.core.util.Logger.d(
+                                "BiliPaiVRback",
+                                "VideoActivity.onBack VR path, finishAndRemoveTask"
+                            )
+                            finishAndRemoveTask()
                         } else {
                             onBackPressedDispatcher.onBackPressed()
                         }
