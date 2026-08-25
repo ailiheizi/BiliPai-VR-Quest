@@ -83,10 +83,12 @@ private fun AppIconButtonImpl(
     variant: AppIconButtonVariant,
     content: @Composable () -> Unit,
 ) {
+    // VR 面板里射线悬停放大（磁吸），触摸端无 hover 事件、恒为 1f 缩放
+    val hoverModifier = modifier.magnetHover()
     when (LocalAppUiStyle.current) {
         AppUiStyle.MATERIAL3 -> AppMaterial3IconButton(
             onClick = onClick,
-            modifier = modifier,
+            modifier = hoverModifier,
             enabled = enabled,
             colors = colors,
             interactionSource = interactionSource,
@@ -95,7 +97,7 @@ private fun AppIconButtonImpl(
         )
         AppUiStyle.MIUIX -> AppMiuixIconButton(
             onClick = onClick,
-            modifier = modifier,
+            modifier = hoverModifier,
             enabled = enabled,
             colors = colors,
             interactionSource = interactionSource,

@@ -289,42 +289,6 @@ fun AppTextButton(
 }
 
 @Composable
-fun AppIconButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
-    interactionSource: MutableInteractionSource? = null,
-    content: @Composable () -> Unit,
-) = IconButton(
-    onClick = onClick,
-    modifier = modifier.magnetHover(),
-    enabled = enabled,
-    colors = colors,
-    interactionSource = interactionSource,
-    content = content,
-)
-
-@Composable
-fun AppFilledIconButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    shape: Shape = IconButtonDefaults.filledShape,
-    colors: IconButtonColors = IconButtonDefaults.filledIconButtonColors(),
-    interactionSource: MutableInteractionSource? = null,
-    content: @Composable () -> Unit,
-) = FilledIconButton(
-    onClick = onClick,
-    modifier = modifier,
-    enabled = enabled,
-    shape = shape,
-    colors = colors,
-    interactionSource = interactionSource,
-    content = content,
-)
-
-@Composable
 fun AppOutlinedTextField(
     value: String,
     onValueChange: (String) -> Unit,
