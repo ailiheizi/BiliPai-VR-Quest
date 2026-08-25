@@ -3,8 +3,8 @@
 > ## 🥽 VR Fork
 > 本仓库是 **BiliPai 的 Meta Quest VR 分支**（Fork）。
 > 在 Quest 2/3 上用 Meta Spatial SDK 把 BiliPai 渲染成 VR 曲面面板，支持手部射线 + 手势操作。
-> **VR 实现代码在 [`vr/quest`](https://github.com/ailiheizi/BiliPai/tree/vr/quest) 分支**；本分支（main）为手机端纯净基线，仅同步上游。
-> 文档见 [`docs/vr/`](https://github.com/ailiheizi/BiliPai/tree/vr/quest/docs/vr)。
+> **VR 实现代码在 [`vr/quest`](https://github.com/ailiheizi/BiliPai-VR-Quest/tree/vr/quest) 分支**；本分支（main）为手机端纯净基线，仅同步上游。
+> 文档见 [`docs/vr/`](https://github.com/ailiheizi/BiliPai-VR-Quest/tree/vr/quest/docs/vr)。
 
 <img src="docs/images/233娘.jpeg" height="96" alt="BiliPai" />
 
